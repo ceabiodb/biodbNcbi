@@ -1,0 +1,37 @@
+Package: biodbNcbi
+Title: biodbNcbi, a library for connecting to NCBI Databases.
+Version: 0.99.0
+Authors@R: c(person("Pierrick", "Roger", email = "pierrick.roger@cea.fr", role = c("aut", "cre")))
+Description: The biodbNcbi library provides access to NCBI Databases, using biodb package framework.
+biocViews: Software, Infrastructure, DataImport
+Depends:
+    R (>= 3.6)
+License: AGPL-3
+Encoding: UTF-8
+LazyData: true
+VignetteBuilder: knitr
+Suggests:
+	BiocStyle,
+	roxygen2,
+	devtools,
+	testthat (>= 2.0.0),
+	knitr,
+	rmarkdown,
+	biodb
+Imports:
+	methods
+RoxygenNote: 6.1.1
+Collate:
+    'NcbiConn.R'
+    'NcbiCcdsConn.R'
+    'NcbiCcdsEntry.R'
+    'NcbiEntrezConn.R'
+    'NcbiGeneConn.R'
+    'NcbiGeneEntry.R'
+    'NcbiPubchemConn.R'
+    'NcbiPubchemCompConn.R'
+    'NcbiPubchemEntry.R'
+    'NcbiPubchemCompEntry.R'
+    'NcbiPubchemSubstConn.R'
+    'NcbiPubchemSubstEntry.R'
+    'package.R'
