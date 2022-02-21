@@ -1,0 +1,19 @@
+email: pierrick.roger@cea.fr
+dbName: ncbi.ccds
+dbTitle: NCBI CCDS database.
+firstname: Pierrick
+lastname: Roger
+newPkg: no
+connType: plain
+entryType: html
+remote: yes
+makefile: yes
+githubRepos: pkrog/biodbNcbi
+pkgName: biodbNcbi
+pkgLicense: AGPL-3
+editable: no
+writable: no
+downloadable: no
+travis: no
+rcpp: no
+vignetteName: biodbNcbi
