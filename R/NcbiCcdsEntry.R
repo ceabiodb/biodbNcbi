@@ -27,9 +27,9 @@ inherit=biodb::BiodbHtmlEntry,
 
 private=list(
 
-isParsedContentCorrect=function(parsed.content) {
+doCheckContent=function(content) {
     xpath <- "//*[starts-with(.,'No results found for CCDS ID ')]"
-    return(length(XML::getNodeSet(parsed.content, xpath)) == 0)
+    return(length(XML::getNodeSet(content, xpath)) == 0)
 }
 
 ))

@@ -1,11 +1,3 @@
-# vi: fdm=marker ts=4 et cc=80 tw=80
-
-# NcbiPubchemConn {{{1
-################################################################################
-
-# Declaration {{{2
-################################################################################
-
 #' NCBI PubChem connector abstractclass.
 #'
 #' This is an abstract class, mother class of all NCBI PubChem connector
@@ -13,7 +5,7 @@
 #'
 #' @examples
 #' # Create an instance with default settings:
-#' mybiodb <- biodb::Biodb()
+#' mybiodb <- biodb::newInst()
 #'
 #' # Create a connector
 #' conn <- mybiodb$getFactory()$createConn('ncbi.pubchem.comp')
