@@ -205,8 +205,7 @@ private=list(
 
         # Get URL requests
         url.requests <- self$getEntryContentRequest(entry.id,
-                                                     concatenate=concatenate,
-                                                     max.length=URL.MAX.LENGTH)
+            concatenate=concatenate, max.length=URL.MAX.LENGTH)
 
         # Loop on all URLs
         for (url in url.requests) {
@@ -216,8 +215,8 @@ private=list(
 
             if (is.na(xmlstr) || length(grep('<ERROR>', xmlstr)) > 0) {
                 if (concatenate) {
-                    self$caution("Something went wrong while downloading",
-                                  " several entries at once.")
+                    biodb::warn0("Something went wrong while downloading",
+                        " several entries at once.")
                     concatenate <- FALSE
                     done <- FALSE
                     break
