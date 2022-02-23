@@ -30,10 +30,10 @@ public=list(
 #' @description
 #' New instance initializer. Connector classes must not be instantiated
 #' directly. Instead, you must use the createConn() method of the factory class.
-#' @param db.name
-#' @param id.xmltag
-#' @param entry.xmltag
-#' @param id.urlfield
+#' @param db.name      PubChem database name.
+#' @param id.xmltag    XML tag for ID.
+#' @param entry.xmltag XML tag for entry.
+#' @param id.urlfield  Database ID to use when building URL.
 #' @param ... All other parameters are passed to the super class initializer.
 #' @return Nothing.
 initialize=function(db.name, id.xmltag, entry.xmltag, id.urlfield, ...) {

@@ -19,11 +19,11 @@
 #' @import R6
 #' @export
 NcbiPubchemCompEntry <- R6::R6Class("NcbiPubchemCompEntry",
-inhderit=NcbiPubchemEntry,
+inherit=NcbiPubchemEntry,
 
 private=list(
 
-,doParseFieldsStep2=function(parsed.content) {
+doParseFieldsStep2=function(parsed.content) {
 
     # Set names
     names <- character()

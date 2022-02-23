@@ -30,7 +30,7 @@ inherit=biodb::BiodbConn,
 
 private=list(
 
-,doGetEntryPageUrl=function(id) {
+doGetEntryPageUrl=function(id) {
 
     fct <- function(x) {
         u <- c(self$getPropValSlot('urls', 'base.url'), 'CcdsBrowse.cgi')

@@ -117,5 +117,6 @@ fields:
 
   aa.seq:
     alias: sequence
-    computable.from: ncbi.ccds
+    computable.from:
+      - database: ncbi.ccds
     description: Amino acids sequence.

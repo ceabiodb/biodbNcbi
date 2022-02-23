@@ -28,8 +28,8 @@ inherit=biodb::BiodbHtmlEntry,
 private=list(
 
 doCheckContent=function(content) {
-    xpath <- "//*[starts-with(.,'No results found for CCDS ID ')]"
-    return(length(XML::getNodeSet(content, xpath)) == 0)
+    return(length(grep('No results found for CCDS ID ', content, fixed=TRUE))
+        == 0)
 }
 
 ))
