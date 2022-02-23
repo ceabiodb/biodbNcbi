@@ -1,3 +1,10 @@
+test_wsEinfo <- function(conn) {
+    info <- conn$wsEinfo() 
+    testthat::expect_is(info, 'character')
+    testthat::expect_true(length(info) == 1)
+    testthat::expect_false(is.na(info))
+}
+
 # Set test context
 biodb::testContext("Gene tests")
 
@@ -36,6 +43,7 @@ conn <- biodb$getFactory()$createConn('ncbi.gene')
 testRefFolder <- system.file("testref", package='biodbNcbi')
 biodb::runGenericTests(conn, pkgName="biodbNcbi",
     testRefFolder=testRefFolder, opt=list(max.results=1))
+biodb::testThat("Web service einfo works correctly.", test_wsEinfo, conn=conn)
 
 # Terminate Biodb
 biodb$terminate()

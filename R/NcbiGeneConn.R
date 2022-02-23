@@ -26,8 +26,11 @@ inherit=NcbiEntrezConn,
 
 public=list(
 
+#' @description
+#' New instance initializer.
+#' @param ... All other parameters are passed to the super class initializer.
+#' @return Nothing.
 initialize=function(...) {
-
     super$initialize(entrez.name='gene', entrez.tag='Entrezgene',
         entrez.id.tag='Gene-track_geneid', ...)
 }

@@ -22,7 +22,7 @@
 #' @import XML
 #' @export
 NcbiEntrezConn <- R6::R6Class("NcbiEntrezConn",
-inherit=biodb:BiodbConn,
+inherit=biodb::BiodbConn,
 
 public=list(
 

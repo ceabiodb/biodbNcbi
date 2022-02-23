@@ -1,21 +1,15 @@
-test_wsEinfo <- function(conn) {
-    print("================================")
-    print(conn$wsEinfo())
-    print("================================")
-}
-
 # Set test context
 biodb::testContext("CCDS tests")
 
 # Instantiate Biodb
-biodb <- biodb::createBiodbTestInstance(ack=TRUE)
+bdb <- biodb::createBiodbTestInstance(ack=TRUE)
 
 # Load package definitions
 defFile <- system.file("definitions.yml", package='biodbNcbi')
-biodb$loadDefinitions(defFile)
+bdb$loadDefinitions(defFile)
 
 # Create connector
-conn <- biodb$getFactory()$createConn('ncbi.ccds')
+conn <- bdb$getFactory()$createConn('ncbi.ccds')
 
 # Run generic tests
 #
@@ -42,7 +36,6 @@ conn <- biodb$getFactory()$createConn('ncbi.ccds')
 testRefFolder <- system.file("testref", package='biodbNcbi')
 biodb::runGenericTests(conn, pkgName="biodbNcbi",
     testRefFolder=testRefFolder, opt=list(max.results=1))
-biodb::testThat("Web service einfo works correctly.", test_wsEinfo, conn=conn)
 
 # Terminate Biodb
-biodb$terminate()
+bdb$terminate()
