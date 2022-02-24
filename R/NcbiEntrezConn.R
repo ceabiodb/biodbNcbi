@@ -59,7 +59,7 @@ initialize=function(entrez.name, entrez.tag=NULL, entrez.id.tag=NULL, ...) {
 #' return the parsed results, as an XML object. 'request' will return a
 #' BiodbRequest object representing the request as it would have been sent.
 #' @return Depending on `retfmt` parameter.
-,wsEfetch=function(id, rettype=NA_character_, retmode=NA_character_,
+,wsEfetch=function(id, rettype=NULL, retmode=NULL,
     retfmt=c('plain', 'parsed', 'request')) {
 
     retfmt <- match.arg(retfmt)
@@ -107,14 +107,13 @@ wsEsearch=function(term, field=NULL, retmax=NULL,
 
     retfmt <- match.arg(retfmt)
     chk::chk_null_or(field, chk::chk_string)
-    chk::chk_null_or(retmax, chk::chk_integer)
-    chk::chk_gt(retmax, 0)
+    chk::chk_null_or(retmax, chk::chk_whole_number)
 
     # Build request
     params <- c(db=private$entrez.name, term=term)
     if ( ! is.null(field))
         params <- c(params, field=field)
-    if ( ! is.null(retmax))
+    if ( ! is.null(retmax) && retmax > 0)
         params <- c(params, retmax=retmax)
     u <- c(self$getPropValSlot('urls', 'ws.url'), 'esearch.fcgi')
     url <- biodb::BiodbUrl$new(url=u, params=params)
@@ -190,7 +189,7 @@ private=list(
 ,doGetEntryContentFromDb=function(id) {
 
     # Debug
-    biodb::logInfo0("Get entry content(s) for ", length(entry.id)," id(s)...")
+    biodb::logInfo("Get entry content(s) for %d id(s)...", length(id))
 
     URL.MAX.LENGTH <- 2048
     concatenate <- TRUE
@@ -201,17 +200,17 @@ private=list(
         done <- TRUE
 
         # Initialize return values
-        content <- rep(NA_character_, length(entry.id))
+        content <- rep(NA_character_, length(id))
 
         # Get URL requests
-        url.requests <- self$getEntryContentRequest(entry.id,
+        url.requests <- self$getEntryContentRequest(id,
             concatenate=concatenate, max.length=URL.MAX.LENGTH)
 
         # Loop on all URLs
-        for (url in url.requests) {
+        for (request in url.requests) {
 
             # Send request
-            xmlstr <- self$getBiodb()$getRequestScheduler()$getUrl(url)
+            xmlstr <- self$getBiodb()$getRequestScheduler()$sendRequest(request)
 
             if (is.na(xmlstr) || length(grep('<ERROR>', xmlstr)) > 0) {
                 if (concatenate) {
@@ -234,7 +233,7 @@ private=list(
             # Store contents
             nodes <- XML::getNodeSet(xml, paste0("//", private$entrez.tag))
             c <- vapply(nodes, XML::saveXML, FUN.VALUE='')
-            content[match(returned.ids, entry.id)] <- c
+            content[match(returned.ids, id)] <- c
         }
     }
 

@@ -35,7 +35,7 @@ conn <- biodb$getFactory()$createConn('ncbi.pubchem.comp')
 # in order to enable generic tests to run:
 testRefFolder <- system.file("testref", package='biodbNcbi')
 biodb::runGenericTests(conn, pkgName="biodbNcbi",
-    testRefFolder=testRefFolder, opt=list(max.results=1))
+    testRefFolder=testRefFolder, opt=list(max.results=10))
 
 # Terminate Biodb
 biodb$terminate()

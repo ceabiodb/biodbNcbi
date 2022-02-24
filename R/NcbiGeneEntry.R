@@ -25,12 +25,8 @@ inherit=biodb::BiodbXmlEntry,
 private=list(
 
 doCheckContent=function(content) {
-
-    n <- XML::getNodeSet(content, "//Error")
-    if (length(n) == 0)
-        n <- XML::getNodeSet(content, "//ERROR")
-
-    return(length(n) == 0)
+    return(length(grep('<Error', content, fixed=TRUE)) ==0
+        && length(grep('<ERROR', content, fixed=TRUE)) ==0)
 }
 
 ,doParseFieldsStep2=function(parsed.content) {

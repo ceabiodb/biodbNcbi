@@ -95,7 +95,7 @@ private=list(
 
 ,doGetEntryContentFromDb=function(id) {
 
-    biodb::logInfo("Get entry content(s) for %d id(s)...", length(entry.id))
+    biodb::logInfo("Get entry content(s) for %d id(s)...", length(id))
 
     URL.MAX.LENGTH <- 2048
     concatenate <- TRUE
@@ -106,18 +106,17 @@ private=list(
         done <- TRUE
 
         # Initialize return values
-        content <- rep(NA_character_, length(entry.id))
+        content <- rep(NA_character_, length(id))
 
         # Get URL requests
-        url.requests <- self$getEntryContentRequest(entry.id,
-                                                     concatenate=concatenate,
-                                                     max.length=URL.MAX.LENGTH)
+        url.requests <- self$getEntryContentRequest(id,
+            concatenate=concatenate, max.length=URL.MAX.LENGTH)
 
         # Loop on all URLs
-        for (url in url.requests) {
+        for (request in url.requests) {
 
             # Send request
-            xmlstr <- self$getBiodb()$getRequestScheduler()$getUrl(url)
+            xmlstr <- self$getBiodb()$getRequestScheduler()$sendRequest(request)
 
             re <- 'PUGREST.BadRequest|PUGREST.NotFound'
             if (is.na(xmlstr) || length(grep(re, xmlstr)) > 0) {
@@ -143,7 +142,7 @@ private=list(
             xpath <- paste0("//pcns:", private$entry.xmltag)
             nodes <- XML::getNodeSet(xml, xpath, namespaces=ns)
             c <- vapply(nodes, XML::saveXML, FUN.VALUE='')
-            content[match(returned.ids, entry.id)] <- c
+            content[match(returned.ids, id)] <- c
         }
     }
 

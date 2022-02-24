@@ -37,8 +37,7 @@ initialize=function(...) {
 private=list(
 
 doCheckContent=function(content) {
-    fault <- XML::xpathSApply(content, "/Fault", XML::xmlValue)
-    return(length(fault) == 0)
+    return(length(grep('<Fault', content, fixed=TRUE)) == 0)
 }
 
 ))

@@ -50,12 +50,12 @@ databases:
       comp.iupac.name.pref: //PC-Urn_label[text()='IUPAC Name']/../PC-Urn_name[text()='Preferred']/../../..//PC-InfoData_value_sval
       comp.iupac.name.syst: //PC-Urn_label[text()='IUPAC Name']/../PC-Urn_name[text()='Systematic']/../../..//PC-InfoData_value_sval
       comp.iupac.name.trad: //PC-Urn_label[text()='IUPAC Name']/../PC-Urn_name[text()='Traditional']/../../..//PC-InfoData_value_sval
-      exact.mass: //PC-Urn_label[text()='Mass']/../../..//PC-InfoData_value_fval
+      exact.mass: //PC-Urn_label[text()='Mass']/../../..//PC-InfoData_value_sval
       formula: //PC-Urn_label[text()='Molecular Formula']/../../..//PC-InfoData_value_sval
       inchi: //PC-Urn_label[text()='InChI']/../../..//PC-InfoData_value_sval
       inchikey: //PC-Urn_label[text()='InChIKey']/../../..//PC-InfoData_value_sval
       logp: //PC-Urn_label[text()='Log P']/../../..//PC-InfoData_value_fval
-      molecular.weight: //PC-Urn_label[text()='Molecular Weight']/../../..//PC-InfoData_value_fval
+      molecular.weight: //PC-Urn_label[text()='Molecular Weight']/../../..//PC-InfoData_value_sval
       smiles.canonical: //PC-Urn_label[text()='SMILES']/../PC-Urn_name[text()='Canonical']/../../..//PC-InfoData_value_sval
       smiles.isomeric: //PC-Urn_label[text()='SMILES']/../PC-Urn_name[text()='Isomeric']/../../..//PC-InfoData_value_sval
     scheduler.t: 1
@@ -120,3 +120,10 @@ fields:
     computable.from:
       - database: ncbi.ccds
     description: Amino acids sequence.
+
+  uniprot.id:
+    description: UniProt ID
+    case.insensitive: true
+    forbids.duplicates: true
+    type: id
+    card: many

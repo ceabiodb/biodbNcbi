@@ -47,7 +47,7 @@ doGetEntryPageUrl=function(id) {
     return(vapply(id, fct, FUN.VALUE=''))
 }
 
-,doSearchForEntries=function(fields=NULL, max.results=NA_integer_) {
+,doSearchForEntries=function(fields=NULL, max.results=0L) {
 
     ids <- character()
 
@@ -58,15 +58,15 @@ doGetEntryPageUrl=function(id) {
             term <- paste0('"', fields$name, '"', '[Gene Name]')
 
             # Set retmax
-            if (is.na(max.results)) {
+            if (max.results <=0) {
                 xml <- self$wsEsearch(term=term, retmax=0, retfmt='parsed')
                 xpath <- "/eSearchResult/Count"
                 retmax <- as.integer(XML::xpathSApply(xml, xpath, XML::xmlValue))
                 if (length(retmax) == 0)
-                    retmax <- NA_integer_
+                    retmax <- NULL
             }
             else
-                retmax <- max.results
+                retmax <- as.integer(max.results)
 
             # Send request
             ids <- self$wsEsearch(term=term, retmax=retmax, retfmt='ids')

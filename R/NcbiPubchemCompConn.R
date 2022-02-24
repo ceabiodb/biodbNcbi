@@ -44,8 +44,6 @@ doSearchForEntries=function(fields=NULL, max.results=0) {
 
     if ( ! is.null(fields)) {
 
-        private$checkMassField(mass=mass, mass.field=mass.field)
-
         term <- character()
 
         # Search by name
@@ -61,15 +59,8 @@ doSearchForEntries=function(fields=NULL, max.results=0) {
                 else
                     pubchem.mass.field <- 'MolecularWeight'
 
-                if (mass.tol.unit == 'ppm') {
-                    mass.min <- mass * (1 - mass.tol * 1e-6)
-                    mass.max <- mass * (1 + mass.tol * 1e-6)
-                } else {
-                    mass.min <- mass - mass.tol
-                    mass.max <- mass + mass.tol
-                }
-
-                mass.term <- paste0(mass.min, ':', mass.max, '[',
+                rng <- do.call(biodb::Range$new, fields[[mass.field]])
+                mass.term <- paste0(rng$getMin(), ':', rng$getMax(), '[',
                                     pubchem.mass.field, ']')
 
                 if (length(term) > 0)
