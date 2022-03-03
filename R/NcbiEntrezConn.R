@@ -2,6 +2,9 @@
 #'
 #' This is an abstract class, mother class of all NCBI Entrez connector classes.
 #'
+#' Note: the implementation of the \code{getEntryIds()} method uses a last
+#' resort solution.  It returns only a small subset of Ncbi entries.
+#'
 #' @seealso \code{\link{BiodbConn}}.
 #'
 #' @examples
@@ -214,7 +217,7 @@ private=list(
             xmlstr <- self$getBiodb()$getRequestScheduler()$sendRequest(request)
 
             if (is.na(xmlstr) || length(grep('<ERROR>', xmlstr)) > 0) {
-                if (concatenate) {
+                if (concatenate && length(urls) > 1) {
                     biodb::warn0("Something went wrong while downloading",
                         " several entries at once.")
                     concatenate <- FALSE
@@ -259,9 +262,7 @@ private=list(
 
 ,doGetEntryIds=function(max.results=NA_integer_) {
 
-    biodb::warn0("Method using a last resort solution for its implementation.",
-        " Returns only a small subset of Ncbi entries.")
-
+    # XXX Returns only a small subset of Ncbi entries
     retmax <- if (is.na(max.results)) 1000000 else max.results
     return(self$wsEsearch(term='e', retmax=retmax, retfmt='ids'))
 }
