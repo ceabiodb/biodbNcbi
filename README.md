@@ -1,5 +1,41 @@
 # biodbNcbi
 
+An R package for accessing NCBI databases, based on R
+package/framework [biodb](https://github.com/pkrog/biodb/).
+
+## Introduction
+
+This package is an extension of [biodb](https://github.com/pkrog/biodb/) that
+implements connectors to NCBI databases.
+
+## Installation
+
+Install the latest version of this package by running the following commands:
+```r
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install('biodb')
+devtools::install_github('pkrog/biodbNcbi', dependencies=TRUE)
+```
+
+## Examples
+
+To instantiate a connector to, for instance, NCBI CCDS run:
+```r
+mybiodb <- biodb::newInst()
+conn <- mybiodb$getFactory()$createConn('ncbi.ccds')
+mybiodb$terminate()
+```
+
+## Documentation
+
+To get documentation on the implemented connector, run the following command in
+R:
+```r
+?biodbNcbi::NcbiCcdsConn
+```
+
+
 ## Citations
 
 <https://www.ncbi.nlm.nih.gov/gene>

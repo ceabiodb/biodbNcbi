@@ -1,20 +1,15 @@
-# vi: fdm=marker ts=4 et cc=80 tw=80
-
-# NcbiEntrezConn {{{1
-################################################################################
-
-# Declaration {{{2
-################################################################################
-
 #' NCBI Entrez connector abstract class.
 #'
 #' This is an abstract class, mother class of all NCBI Entrez connector classes.
 #'
-#' This is the connector class for a NCBI Gene database.
+#' Note: the implementation of the \code{getEntryIds()} method uses a last
+#' resort solution.  It returns only a small subset of Ncbi entries.
+#'
+#' @seealso \code{\link{BiodbConn}}.
 #'
 #' @examples
 #' # Create an instance with default settings:
-#' mybiodb <- biodb::Biodb()
+#' mybiodb <- biodb::newInst()
 #'
 #' # Create a connector
 #' conn <- mybiodb$getFactory()$createConn('ncbi.gene')
@@ -25,77 +20,69 @@
 #' # Terminate instance.
 #' mybiodb$terminate()
 #'
-#' @include NcbiConn.R
-#' @export NcbiEntrezConn
-#' @exportClass NcbiEntrezConn
-NcbiEntrezConn <- methods::setRefClass("NcbiEntrezConn",
-    contains="NcbiConn",
-    fields=list(
-        .entrez.name="character",
-        .entrez.tag='character',
-        .entrez.id.tag='character'),
+#' @import biodb
+#' @import R6
+#' @import XML
+#' @export
+NcbiEntrezConn <- R6::R6Class("NcbiEntrezConn",
+inherit=biodb::BiodbConn,
 
-# Public methods {{{2
-################################################################################
+public=list(
 
-methods=list(
+#' @description
+#' New instance initializer. Connector classes must not be instantiated
+#' directly. Instead, you must use the createConn() method of the factory class.
+#' @param entrez.name   Entrez database name (ex: "gene").
+#' @param entrez.tag    Entrez database tag (ex: "Entrezgene").
+#' @param entrez.id.tag Entrez database ID tag (ex: "Gene-track_geneid").
+#' @param ... All other parameters are passed to the super class initializer.
+#' @return Nothing.
+initialize=function(entrez.name, entrez.tag=NULL, entrez.id.tag=NULL, ...) {
 
-# Initialize {{{3
-################################################################################
+    super$initialize(...)
+    abstractClass('NcbiEntrezConn', self)
+    chk::chk_string(entrez.name)
+    chk::chk_null_or(entrez.tag, chk::chk_string)
+    chk::chk_null_or(entrez.id.tag, chk::chk_string)
 
-initialize=function(entrez.name=NA_character_, entrez.tag=NA_character_,
-                    entrez.id.tag=NA_character_, ...) {
+    # Set values
+    private$entrez.name <- entrez.name
+    private$entrez.tag <- entrez.tag
+    private$entrez.id.tag <- entrez.id.tag
+}
 
-    # Call parent constructor
-    callSuper(...)
-    .self$.abstractClass('NcbiEntrezConn')
-
-    # Set name
-    if (is.null(entrez.name) || is.na(entrez.name))
-        .self$error("You must set an Entrez name for this NCBI database.")
-    .self$.entrez.name <- entrez.name
-
-    # Set tag
-    .self$.entrez.tag <- if (is.null(entrez.tag)) NA_character_ else entrez.tag
-
-    # Set ID tag
-    .self$.entrez.id.tag <- (if (is.null(entrez.id.tag)) NA_character_
-                             else entrez.id.tag)
-},
-
-# Web service efetch {{{3
-################################################################################
-
-wsEfetch=function(id, rettype=NA_character_, retmode=NA_character_,
-                  retfmt=c('plain', 'parsed', 'request')) {
-    ":\n\nCalls Entrez efetch web service. See
-    https://www.ncbi.nlm.nih.gov/books/NBK25499/#chapter4.EFetch.
-    \nid: A character vector of entry IDs.
-    \nrettype: The retrieval type. See NCBI documentation.
-    \nretmode: The retrieval mode. See NCBI documentation.
-    \nretfmt: Use to set the format of the returned value. 'plain' will return
-    the raw results from the server, as a character value. 'parsed' will return
-    the parsed results, as an XML object. 'request' will return a BiodbRequest
-    object representing the request as it would have been sent.
-    \nReturned value: Depending on `retfmt` parameter.
-    "
+#' @description
+#' Calls Entrez efetch web service. See
+#' https://www.ncbi.nlm.nih.gov/books/NBK25499/#chapter4.EFetch.
+#' @param id A character vector of entry IDs.
+#' @param rettype The retrieval type. See NCBI documentation.
+#' @param retmode The retrieval mode. See NCBI documentation.
+#' @param retfmt Use to set the format of the returned value. 'plain' will
+#' return the raw results from the server, as a character value. 'parsed' will
+#' return the parsed results, as an XML object. 'request' will return a
+#' BiodbRequest object representing the request as it would have been sent.
+#' @return Depending on `retfmt` parameter.
+,wsEfetch=function(id, rettype=NULL, retmode=NULL,
+    retfmt=c('plain', 'parsed', 'request')) {
 
     retfmt <- match.arg(retfmt)
+    chk::chk_null_or(rettype, chk::chk_string)
+    chk::chk_null_or(retmode, chk::chk_string)
 
     # Build request
-    params <- c(db=.self$.entrez.name, id=paste(id, collapse=','))
-    if ( ! is.na(rettype))
+    params <- c(db=private$entrez.name, id=paste(id, collapse=','))
+    if ( ! is.null(rettype))
         params <- c(params, rettype=rettype)
-    if ( ! is.na(retmode))
+    if ( ! is.null(retmode))
         params <- c(params, retmode=retmode)
-    u <- c(.self$getPropValSlot('urls', 'ws.url'), 'efetch.fcgi')
-    url <- BiodbUrl(url=u, params=params)
-    request <- .self$makeRequest(method='get', url=url)
+    u <- c(self$getPropValSlot('urls', 'ws.url'), 'efetch.fcgi')
+    url <- biodb::BiodbUrl$new(url=u, params=params)
+    request <- self$makeRequest(method='get', url=url)
     if (retfmt == 'request')
         return(request)
 
     # Send request
-    results <- .self$getBiodb()$getRequestScheduler()$sendRequest(request)
+    results <- self$getBiodb()$getRequestScheduler()$sendRequest(request)
 
     # Parse
     if (retfmt == 'parsed' && retmode == 'xml')
@@ -104,40 +91,41 @@ wsEfetch=function(id, rettype=NA_character_, retmode=NA_character_,
     return(results)
 },
 
-# Web service esearch {{{3
-################################################################################
-
-wsEsearch=function(term, field=NA_character_, retmax=NA_integer_,
-                   retfmt=c('plain', 'parsed', 'request', 'ids')) {
-    ":\n\nCalls Entrez esearch web service. See
-    https://www.ncbi.nlm.nih.gov/books/NBK25499/#chapter4.ESearch.
-    \nterm: Text query. See NCBI documentation.
-    \nfield: Entrez field to which to limit the search. See NCBI documentation.
-    \nretmax: Maximum number of entry IDs to return.
-    \nretfmt: Use to set the format of the returned value. 'plain' will return
-    the raw results from the server, as a character value. 'parsed' will return
-    the parsed results, as an XML object. 'request' will return a BiodbRequest
-    object representing the request as it would have been sent. 'ids' will
-    return a character vector containing the IDs of the matching entries.
-    \nReturned value: Depending on `retfmt` parameter.
-    "
+#' @description
+#' Calls Entrez esearch web service. See
+#' https://www.ncbi.nlm.nih.gov/books/NBK25499/#chapter4.ESearch.
+#' @param term Text query. See NCBI documentation.
+#' @param field Entrez field to which to limit the search. See NCBI
+#' documentation.
+#' @param retmax Maximum number of entry IDs to return.
+#' @param retfmt Use to set the format of the returned value. 'plain' will
+#' return the raw results from the server, as a character value. 'parsed' will
+#' return the parsed results, as an XML object. 'request' will return a
+#' BiodbRequest object representing the request as it would have been sent.
+#' 'ids' will return a character vector containing the IDs of the matching
+#' entries.
+#' @return Depending on `retfmt` parameter.
+wsEsearch=function(term, field=NULL, retmax=NULL,
+    retfmt=c('plain', 'parsed', 'request', 'ids')) {
 
     retfmt <- match.arg(retfmt)
+    chk::chk_null_or(field, chk::chk_string)
+    chk::chk_null_or(retmax, chk::chk_whole_number)
 
     # Build request
-    params <- c(db=.self$.entrez.name, term=term)
-    if ( ! is.na(field))
+    params <- c(db=private$entrez.name, term=term)
+    if ( ! is.null(field))
         params <- c(params, field=field)
-    if ( ! is.null(retmax) && ! is.na(retmax) && retmax > 0)
+    if ( ! is.null(retmax) && retmax > 0)
         params <- c(params, retmax=as.integer(retmax))
-    u <- c(.self$getPropValSlot('urls', 'ws.url'), 'esearch.fcgi')
-    url <- BiodbUrl(url=u, params=params)
-    request <- .self$makeRequest(method='get', url=url)
+    u <- c(self$getPropValSlot('urls', 'ws.url'), 'esearch.fcgi')
+    url <- biodb::BiodbUrl$new(url=u, params=params)
+    request <- self$makeRequest(method='get', url=url)
     if (retfmt == 'request')
         return(request)
 
     # Send request
-    results <- .self$getBiodb()$getRequestScheduler()$sendRequest(request)
+    results <- self$getBiodb()$getRequestScheduler()$sendRequest(request)
 
     # Parse results
     if (retfmt != 'plain') {
@@ -151,65 +139,60 @@ wsEsearch=function(term, field=NA_character_, retmax=NA_integer_,
     }
 
     return(results)
-},
+}
 
-# Web service einfo {{{3
-################################################################################
-
-wsEinfo=function(retfmt=c('plain', 'request', 'parsed')) {
-    ":\n\nCalls Entrez einfo web service, returning information about this
-    database. See https://www.ncbi.nlm.nih.gov/books/NBK25499/#chapter4.EInfo.
-    \nretfmt: Use to set the format of the returned value. 'plain' will return
-    the raw results from the server, as a character value. 'parsed' will return
-    the parsed results, as an XML object. 'request' will return a BiodbRequest
-    object representing the request as it would have been sent.
-    \nReturned value: Depending on `retfmt` parameter.
-    "
+#' @description
+#' Calls Entrez einfo web service, returning information about this
+#' database. See https://www.ncbi.nlm.nih.gov/books/NBK25499/#chapter4.EInfo.
+#' @param retfmt Use to set the format of the returned value. 'plain' will
+#' return the raw results from the server, as a character value. 'parsed' will
+#' return the parsed results, as an XML object. 'request' will return a
+#' BiodbRequest object representing the request as it would have been sent.
+#' @return Depending on `retfmt` parameter.
+,wsEinfo=function(retfmt=c('plain', 'request', 'parsed')) {
 
     retfmt <- match.arg(retfmt)
 
     # Build request
-    params <- c(db=.self$.entrez.name, version='2.0')
-    u <- c(.self$getPropValSlot('urls', 'ws.url'), 'einfo.fcgi')
-    url <- BiodbUrl(url=u, params=params)
-    request <- .self$makeRequest(method='get', url=url)
+    params <- c(db=private$entrez.name, version='2.0')
+    u <- c(self$getPropValSlot('urls', 'ws.url'), 'einfo.fcgi')
+    url <- biodb::BiodbUrl$new(url=u, params=params)
+    request <- self$makeRequest(method='get', url=url)
     if (retfmt == 'request')
         return(request)
 
     # Send request
-    results <- .self$getBiodb()$getRequestScheduler()$sendRequest(request)
+    results <- self$getBiodb()$getRequestScheduler()$sendRequest(request)
 
     # Parse XML
     if (retfmt == 'parsed')
         results <-  XML::xmlInternalTreeParse(results, asText=TRUE)
 
     return(results)
-},
+}
+),
+                              
+private=list(
+    entrez.name=NULL
+    ,entrez.tag=NULL
+    ,entrez.id.tag=NULL
 
-# Get nb entries {{{3
-################################################################################
-
-getNbEntries=function(count=FALSE) {
-    # Overrides super class' method.
+,doGetNbEntries=function(count=FALSE) {
 
     # Send request
-    xml <- .self$wsEinfo(retfmt='parsed')
+    xml <- self$wsEinfo(retfmt='parsed')
 
     # Get number of elements
     n <- XML::xpathSApply(xml, "//Count", XML::xmlValue)
     n <- as.integer(n)
 
     return(n)
-},
-
-# Get entry content from database {{{3
-################################################################################
-
-getEntryContentFromDb=function(entry.id) {
-    # Overrides super class' method.
+}
+        
+,doGetEntryContentFromDb=function(id) {
 
     # Debug
-    .self$info("Get entry content(s) for ", length(entry.id)," id(s)...")
+    biodb::logInfo("Get entry content(s) for %d id(s)...", length(id))
 
     URL.MAX.LENGTH <- 2048
     concatenate <- TRUE
@@ -220,23 +203,23 @@ getEntryContentFromDb=function(entry.id) {
         done <- TRUE
 
         # Initialize return values
-        content <- rep(NA_character_, length(entry.id))
+        content <- rep(NA_character_, length(id))
 
         # Get URL requests
-        url.requests <- .self$getEntryContentRequest(entry.id,
-                                                     concatenate=concatenate,
-                                                     max.length=URL.MAX.LENGTH)
+        urls <- self$getEntryContentRequest(id,
+            concatenate=concatenate, max.length=URL.MAX.LENGTH)
 
         # Loop on all URLs
-        for (url in url.requests) {
+        for (u in urls) {
 
             # Send request
-            xmlstr <- .self$getBiodb()$getRequestScheduler()$getUrl(url)
+            request <- biodb::BiodbRequest$new(biodb::BiodbUrl$new(u))
+            xmlstr <- self$getBiodb()$getRequestScheduler()$sendRequest(request)
 
             if (is.na(xmlstr) || length(grep('<ERROR>', xmlstr)) > 0) {
-                if (concatenate) {
-                    .self$caution("Something went wrong while downloading",
-                                  " several entries at once.")
+                if (concatenate && length(id) > 1) {
+                    biodb::logDebug0("Something went wrong while downloading",
+                        " several entries at once.")
                     concatenate <- FALSE
                     done <- FALSE
                     break
@@ -248,51 +231,40 @@ getEntryContentFromDb=function(entry.id) {
             xml <-  XML::xmlInternalTreeParse(xmlstr, asText=TRUE)
 
             # Get returned IDs
-            xpath <- paste0("//", .self$.entrez.id.tag)
+            xpath <- paste0("//", private$entrez.id.tag)
             returned.ids <- XML::xpathSApply(xml, xpath, XML::xmlValue)
 
             # Store contents
-            nodes <- XML::getNodeSet(xml, paste0("//", .self$.entrez.tag))
+            nodes <- XML::getNodeSet(xml, paste0("//", private$entrez.tag))
             c <- vapply(nodes, XML::saveXML, FUN.VALUE='')
-            content[match(returned.ids, entry.id)] <- c
+            content[match(returned.ids, id)] <- c
         }
     }
 
     return(content)
-},
+}
 
-# Private methods {{{2
-################################################################################
-
-# Do get entry content request {{{3
-################################################################################
-
-.doGetEntryContentRequest=function(id, concatenate=TRUE) {
+,doGetEntryContentRequest=function(id, concatenate=TRUE) {
 
     if (concatenate)
-        urls <- .self$wsEfetch(id, retmode='xml',
-                               retfmt='request')$getUrl()$toString()
+        urls <- self$wsEfetch(id, retmode='xml',
+            retfmt='request')$getUrl()$toString()
     else {
         fct <- function(single.id) { 
-            .self$wsEfetch(single.id, retmode='xml',
-                           retfmt='request')$getUrl()$toString()
+            self$wsEfetch(single.id, retmode='xml',
+                retfmt='request')$getUrl()$toString()
         }
         urls <- vapply(id, fct, FUN.VALUE='')
     }
 
     return(urls)
-},
+}
 
-# Get entry ids {{{3
-################################################################################
+,doGetEntryIds=function(max.results=NA_integer_) {
 
-.doGetEntryIds=function(max.results=NA_integer_) {
-
-    .self$caution("Method using a last resort solution for its implementation.",
-                  " Returns only a small subset of Ncbi entries.")
-
-    retmax <- if (is.na(max.results)) 1000000 else max.results
-    return(.self$wsEsearch(term='e', retmax=retmax, retfmt='ids'))
+    # XXX Returns only a small subset of Ncbi entries
+    retmax <- if (is.na(max.results)) 1000000L else as.integer(max.results)
+    return(self$wsEsearch(term='e', retmax=retmax, retfmt='ids'))
 }
 
 ))

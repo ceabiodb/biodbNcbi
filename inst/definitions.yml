@@ -1,23 +1,26 @@
-# vi: fdm=marker
-
 databases:
 
   ncbi.ccds:
-    entry.content.type: html
     name: NCBI CCDS
+    description: NCBI CCDS database.
+    remote: true
+    entry.content.type: html
     parsing.expr:
       accession:
         attr: value
         path: //input[@id='DATA']
       sequence: //b[starts-with(.,'Nucleotide Sequence')]/../tt
+    scheduler.t: 1
     scheduler.n: 3
     urls:
       base.url: https://www.ncbi.nlm.nih.gov/CCDS/
       ws.url: https://eutils.ncbi.nlm.nih.gov/entrez/eutils
 
   ncbi.gene:
-    entry.content.type: xml
     name: NCBI Gene
+    description: NCBI Gene database.
+    remote: true
+    entry.content.type: xml
     parsing.expr:
       accession: //Gene-track_geneid
       description: //Gene-ref_desc
@@ -25,6 +28,7 @@ databases:
       symbol: //Gene-ref_locus
       synonyms: //Gene-ref_syn_E
       uniprot.id: //Gene-commentary_heading[text()='UniProtKB']/..//Dbtag_db[text()='UniProtKB/Swiss-Prot']/..//Object-id_str
+    scheduler.t: 1
     scheduler.n: 3
     searchable.fields:
         - name
@@ -33,8 +37,11 @@ databases:
       ws.url: https://eutils.ncbi.nlm.nih.gov/entrez/eutils/
 
   ncbi.pubchem.comp:
-    entry.content.type: xml
     name: PubChem Compound
+    description: PubChem Compound database.
+    remote: true
+    compound.db: true
+    entry.content.type: xml
     parsing.expr:
       accession: //PC-CompoundType_id_cid
       comp.iupac.name.allowed: //PC-Urn_label[text()='IUPAC Name']/../PC-Urn_name[text()='Allowed']/../../..//PC-InfoData_value_sval
@@ -43,14 +50,15 @@ databases:
       comp.iupac.name.pref: //PC-Urn_label[text()='IUPAC Name']/../PC-Urn_name[text()='Preferred']/../../..//PC-InfoData_value_sval
       comp.iupac.name.syst: //PC-Urn_label[text()='IUPAC Name']/../PC-Urn_name[text()='Systematic']/../../..//PC-InfoData_value_sval
       comp.iupac.name.trad: //PC-Urn_label[text()='IUPAC Name']/../PC-Urn_name[text()='Traditional']/../../..//PC-InfoData_value_sval
-      exact.mass: //PC-Urn_label[text()='Mass']/../../..//PC-InfoData_value_fval
+      exact.mass: //PC-Urn_label[text()='Mass']/../../..//PC-InfoData_value_sval
       formula: //PC-Urn_label[text()='Molecular Formula']/../../..//PC-InfoData_value_sval
       inchi: //PC-Urn_label[text()='InChI']/../../..//PC-InfoData_value_sval
       inchikey: //PC-Urn_label[text()='InChIKey']/../../..//PC-InfoData_value_sval
       logp: //PC-Urn_label[text()='Log P']/../../..//PC-InfoData_value_fval
-      molecular.weight: //PC-Urn_label[text()='Molecular Weight']/../../..//PC-InfoData_value_fval
+      molecular.weight: //PC-Urn_label[text()='Molecular Weight']/../../..//PC-InfoData_value_sval
       smiles.canonical: //PC-Urn_label[text()='SMILES']/../PC-Urn_name[text()='Canonical']/../../..//PC-InfoData_value_sval
       smiles.isomeric: //PC-Urn_label[text()='SMILES']/../PC-Urn_name[text()='Isomeric']/../../..//PC-InfoData_value_sval
+    scheduler.t: 1
     scheduler.n: 5
     searchable.fields:
         - name
@@ -62,11 +70,14 @@ databases:
       ws2.url: https://pubchem.ncbi.nlm.nih.gov/rest/pug/
 
   ncbi.pubchem.subst:
-    entry.content.type: xml
     name: PubChem Substance
+    description: PubChem Substance database.
+    remote: true
+    entry.content.type: xml
     parsing.expr:
       accession: //PC-ID_id
       ncbi.pubchem.comp.id: //PC-CompoundType_id_cid
+    scheduler.t: 1
     scheduler.n: 5
     urls:
       base.url: https://pubchem.ncbi.nlm.nih.gov/
@@ -106,5 +117,13 @@ fields:
 
   aa.seq:
     alias: sequence
-    computable.from: ncbi.ccds
+    computable.from:
+      - database: ncbi.ccds
     description: Amino acids sequence.
+
+  uniprot.id:
+    description: UniProt ID
+    case.insensitive: true
+    forbids.duplicates: true
+    type: id
+    card: many

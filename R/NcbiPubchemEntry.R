@@ -1,18 +1,10 @@
-# vi: fdm=marker ts=4 et cc=80 tw=80
-
-# NcbiPubchemEntry {{{1
-################################################################################
-
-# Declaration {{{2
-################################################################################
-
 #' NCBI PubChem entry class.
 #'
 #' This the abstract entry class for all NCBI PubChem entry classes.
 #'
 #' @examples
 #' # Create an instance with default settings:
-#' mybiodb <- biodb::Biodb()
+#' mybiodb <- biodb::newInst()
 #'
 #' # Create a connector
 #' conn <- mybiodb$getFactory()$createConn('ncbi.pubchem.comp')
@@ -23,35 +15,29 @@
 #' # Terminate instance.
 #' mybiodb$terminate()
 #'
-#' @include BiodbXmlEntry.R
-#' @export NcbiPubchemEntry
-#' @exportClass NcbiPubchemEntry
-NcbiPubchemEntry <- methods::setRefClass("NcbiPubchemEntry",
-    contains="BiodbXmlEntry",
+#' @import biodb
+#' @import R6
+#' @import XML
+#' @export
+NcbiPubchemEntry <- R6::R6Class("NcbiPubchemEntry",
+inherit=biodb::BiodbXmlEntry,
 
-# Public methods {{{2
-################################################################################
+public=list(
 
-methods=list(
-
-# Initialize {{{3
-################################################################################
-
+#' @description
+#' New instance initializer.
+#' @param ... All other parameters are passed to the super class initializer.
+#' @return Nothing.
 initialize=function(...) {
+    super$initialize(...)
+    abstractClass('NcbiPubchemEntry', self)
+}
+),
 
-    callSuper(...)
-    .self$.abstractClass('NcbiPubchemEntry')
-},
+private=list(
 
-# Private methods {{{2
-################################################################################
-
-# Is parsed content correct {{{3
-################################################################################
-
-.isParsedContentCorrect=function(parsed.content) {
-    fault <- XML::xpathSApply(parsed.content, "/Fault", XML::xmlValue)
-    return(length(fault) == 0)
+doCheckContent=function(content) {
+    return(length(grep('<Fault', content, fixed=TRUE)) == 0)
 }
 
 ))

@@ -1,68 +1,50 @@
-# vi: fdm=marker ts=4 et cc=80 tw=80
-
-# NcbiCcdsConn {{{1
-################################################################################
-
-# Declaration {{{2
-################################################################################
-
 #' NCBI CCDS connector class.
 #'
-#' This is the connector class for a NCBI CCDS database.
+#' Connector class for NCBI CCDS database.
+#'
+#' This is a concrete connector class. It must never be instantiated directly,
+#' but instead be instantiated through the factory \code{\link{BiodbFactory}}.
+#' Only specific methods are described here. See super classes for the
+#' description of inherited methods.
+#'
+#' @seealso \code{\link{BiodbConn}}.
 #'
 #' @examples
 #' # Create an instance with default settings:
-#' mybiodb <- biodb::Biodb()
+#' mybiodb <- biodb::newInst()
 #'
-#' # Create a connector
+#' # Get a connector:
 #' conn <- mybiodb$getFactory()$createConn('ncbi.ccds')
 #'
-#' # Get an entry
+#' # Get the first entry
 #' e <- conn$getEntry('CCDS12227.1')
 #'
 #' # Terminate instance.
 #' mybiodb$terminate()
 #'
-#' @include NcbiConn.R
-#' @export NcbiCcdsConn
-#' @exportClass NcbiCcdsConn
-NcbiCcdsConn <- methods::setRefClass("NcbiCcdsConn",
-    contains="NcbiConn",
+#' @import biodb
+#' @import R6
+#' @export
+NcbiCcdsConn <- R6::R6Class("NcbiCcdsConn",
+inherit=biodb::BiodbConn,
 
-# Public methods {{{2
-################################################################################
+private=list(
 
-methods=list(
-
-# Get entry page url {{{3
-################################################################################
-
-getEntryPageUrl=function(id) {
-    # Overrides super class' method.
+doGetEntryPageUrl=function(id) {
 
     fct <- function(x) {
-        u <- c(.self$getPropValSlot('urls', 'base.url'), 'CcdsBrowse.cgi')
+        u <- c(self$getPropValSlot('urls', 'base.url'), 'CcdsBrowse.cgi')
         p <- list(REQUEST='CCDS', GO='MainBrowse', DATA=x)
-        BiodbUrl(url=u, params=p)$toString()
+        biodb::BiodbUrl$new(url=u, params=p)$toString()
     }
     return(vapply(id, fct, FUN.VALUE=''))
-},
+}
 
+,doGetEntryContentRequest=function(id, concatenate=TRUE) {
+    return(self$getEntryPageUrl(id))
+}
 
-# Private methods {{{2
-################################################################################
-
-# Do get entry content request {{{3
-################################################################################
-
-.doGetEntryContentRequest=function(id, concatenate=TRUE) {
-    return(.self$getEntryPageUrl(id))
-},
-
-# Get entry ids {{{3
-################################################################################
-
-.doGetEntryIds=function(max.results=NA_integer_) {
+,doGetEntryIds=function(max.results=NA_integer_) {
     return(NULL)
 }
 

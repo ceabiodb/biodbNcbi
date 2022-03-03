@@ -1,45 +1,35 @@
-# vi: fdm=marker ts=4 et cc=80 tw=80
-
-# NcbiCcdsEntry {{{1
-################################################################################
-
-# Declaration {{{2
-################################################################################
-
 #' NCBI CCDS entry class.
 #'
-#' This is the entry class for a NCBI CCDS database.
+#' Entry class for NCBI CCDS database.
+#'
+#' @seealso
+#' \code{\link{BiodbHtmlEntry}}.
 #'
 #' @examples
 #' # Create an instance with default settings:
-#' mybiodb <- biodb::Biodb()
+#' mybiodb <- biodb::newInst()
 #'
-#' # Create a connector
+#' # Get a connector for CCDS database:
 #' conn <- mybiodb$getFactory()$createConn('ncbi.ccds')
 #'
-#' # Get an entry
+#' # Get the first entry
 #' e <- conn$getEntry('CCDS12227.1')
 #'
 #' # Terminate instance.
 #' mybiodb$terminate()
 #'
-#' @include BiodbHtmlEntry.R
-#' @export NcbiCcdsEntry
-#' @exportClass NcbiCcdsEntry
-NcbiCcdsEntry <- methods::setRefClass("NcbiCcdsEntry",
-    contains="BiodbHtmlEntry",
+#' @import biodb
+#' @import R6
+#' @import XML
+#' @export
+NcbiCcdsEntry <- R6::R6Class("NcbiCcdsEntry",
+inherit=biodb::BiodbHtmlEntry,
 
-# Private methods {{{2
-################################################################################
+private=list(
 
-methods=list(
-
-# Is parsed content correct {{{3
-################################################################################
-
-.isParsedContentCorrect=function(parsed.content) {
-    xpath <- "//*[starts-with(.,'No results found for CCDS ID ')]"
-    return(length(XML::getNodeSet(parsed.content, xpath)) == 0)
+doCheckContent=function(content) {
+    return(length(grep('No results found for CCDS ID ', content, fixed=TRUE))
+        == 0)
 }
 
 ))

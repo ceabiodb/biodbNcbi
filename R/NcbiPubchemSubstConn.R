@@ -1,18 +1,10 @@
-# vi: fdm=marker ts=4 et cc=80 tw=80
-
-# NcbiPubchemSubstConn {{{1
-################################################################################
-
-# Declaration {{{2
-################################################################################
-
 #' NCBI PubChem Substance connector class.
 #'
 #' This is the connector class for a NCBI PubChen Substance database.
 #'
 #' @examples
 #' # Create an instance with default settings:
-#' mybiodb <- biodb::Biodb()
+#' mybiodb <- biodb::newInst()
 #'
 #' # Create a connector
 #' conn <- mybiodb$getFactory()$createConn('ncbi.pubchem.subst')
@@ -23,24 +15,24 @@
 #' # Terminate instance.
 #' mybiodb$terminate()
 #'
-#' @include NcbiPubchemConn.R
-#' @export NcbiPubchemSubstConn
-#' @exportClass NcbiPubchemSubstConn
-NcbiPubchemSubstConn <- methods::setRefClass("NcbiPubchemSubstConn",
-    contains="NcbiPubchemConn",
+#' @import biodb
+#' @import R6
+#' @import XML
+#' @export
+NcbiPubchemSubstConn <- R6::R6Class("NcbiPubchemSubstConn",
+inherit=NcbiPubchemConn,
 
-# Public methods {{{2
-################################################################################
+public=list(
 
-methods=list(
-
-# Initialize {{{3
-################################################################################
-
+#' @description
+#' New instance initializer. Connector classes must not be instantiated
+#' directly. Instead, you must use the createConn() method of the factory class.
+#' @param ... All other parameters are passed to the super class initializer.
+#' @return Nothing.
 initialize=function(...) {
-    callSuper(db.name='substance', id.xmltag='PC-ID_id',
-              entry.xmltag='PC-Substance', id.urlfield='sid',
-              entrez.name='pcsubstance', ...)
+    super$initialize(db.name='substance', id.xmltag='PC-ID_id',
+        entry.xmltag='PC-Substance', id.urlfield='sid',
+        entrez.name='pcsubstance', ...)
 }
 
 ))

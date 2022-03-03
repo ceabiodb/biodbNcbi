@@ -1,18 +1,10 @@
-# vi: fdm=marker ts=4 et cc=80 tw=80
-
-# NcbiGeneEntry {{{1
-################################################################################
-
-# Declaration {{{2
-################################################################################
-
 #' NCBI Gene entry class.
 #'
 #' This is the entry class for a NCBI Gene database.
 #'
 #' @examples
 #' # Create an instance with default settings:
-#' mybiodb <- biodb::Biodb()
+#' mybiodb <- biodb::newInst()
 #'
 #' # Create a connector
 #' conn <- mybiodb$getFactory()$createConn('ncbi.gene')
@@ -23,44 +15,29 @@
 #' # Terminate instance.
 #' mybiodb$terminate()
 #'
-#' @include BiodbXmlEntry.R
-#' @export NcbiGeneEntry
-#' @exportClass NcbiGeneEntry
-NcbiGeneEntry <- methods::setRefClass("NcbiGeneEntry",
-    contains="BiodbXmlEntry",
+#' @import biodb
+#' @import R6
+#' @import XML
+#' @export
+NcbiGeneEntry <- R6::R6Class("NcbiGeneEntry",
+inherit=biodb::BiodbXmlEntry,
 
-# Private methods {{{2
-################################################################################
+private=list(
 
-methods=list(
+doCheckContent=function(content) {
+    return(length(grep('<Error', content, fixed=TRUE)) ==0
+        && length(grep('<ERROR', content, fixed=TRUE)) ==0)
+}
 
-# Is parsed content correct {{{3
-################################################################################
-
-.isParsedContentCorrect=function(parsed.content) {
-
-    n <- XML::getNodeSet(parsed.content, "//Error")
-    if (length(n) == 0)
-        n <- XML::getNodeSet(parsed.content, "//ERROR")
-
-    return(length(n) == 0)
-},
-
-# Parse fields step 2 {{{3
-################################################################################
-
-.parseFieldsStep2=function(parsed.content) {
+,doParseFieldsStep2=function(parsed.content) {
 
     # CCDS ID
-    ccdsid <- .self$.findCcdsId(parsed.content)
+    ccdsid <- private$findCcdsId(parsed.content)
     if ( ! is.na(ccdsid))
-        .self$setFieldValue('ncbi.ccds.id', ccdsid)
-},
+        self$setFieldValue('ncbi.ccds.id', ccdsid)
+}
 
-# Find ccds id {{{3
-################################################################################
-
-.findCcdsId=function(parsed.content) {
+,findCcdsId=function(parsed.content) {
 
     # 1) Get all CCDS tags.
     xpath <- "//Dbtag_db[text()='CCDS']/..//Object-id_str"
