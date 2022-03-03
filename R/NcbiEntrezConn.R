@@ -117,7 +117,7 @@ wsEsearch=function(term, field=NULL, retmax=NULL,
     if ( ! is.null(field))
         params <- c(params, field=field)
     if ( ! is.null(retmax) && retmax > 0)
-        params <- c(params, retmax=retmax)
+        params <- c(params, retmax=as.integer(retmax))
     u <- c(self$getPropValSlot('urls', 'ws.url'), 'esearch.fcgi')
     url <- biodb::BiodbUrl$new(url=u, params=params)
     request <- self$makeRequest(method='get', url=url)
@@ -217,8 +217,8 @@ private=list(
             xmlstr <- self$getBiodb()$getRequestScheduler()$sendRequest(request)
 
             if (is.na(xmlstr) || length(grep('<ERROR>', xmlstr)) > 0) {
-                if (concatenate && length(urls) > 1) {
-                    biodb::warn0("Something went wrong while downloading",
+                if (concatenate && length(id) > 1) {
+                    biodb::logDebug0("Something went wrong while downloading",
                         " several entries at once.")
                     concatenate <- FALSE
                     done <- FALSE
@@ -263,7 +263,7 @@ private=list(
 ,doGetEntryIds=function(max.results=NA_integer_) {
 
     # XXX Returns only a small subset of Ncbi entries
-    retmax <- if (is.na(max.results)) 1000000 else max.results
+    retmax <- if (is.na(max.results)) 1000000L else as.integer(max.results)
     return(self$wsEsearch(term='e', retmax=retmax, retfmt='ids'))
 }
 

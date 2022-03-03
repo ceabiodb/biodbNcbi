@@ -30,7 +30,7 @@ public=list(
 #' @param ... All other parameters are passed to the super class initializer.
 #' @return Nothing.
 initialize=function(...) {
-    callSuper(db.name='substance', id.xmltag='PC-ID_id',
+    super$initialize(db.name='substance', id.xmltag='PC-ID_id',
         entry.xmltag='PC-Substance', id.urlfield='sid',
         entrez.name='pcsubstance', ...)
 }

@@ -109,19 +109,20 @@ private=list(
         content <- rep(NA_character_, length(id))
 
         # Get URL requests
-        url.requests <- self$getEntryContentRequest(id,
+        urls <- self$getEntryContentRequest(id,
             concatenate=concatenate, max.length=URL.MAX.LENGTH)
 
         # Loop on all URLs
-        for (request in url.requests) {
+        for (u in urls) {
 
             # Send request
+            request <- biodb::BiodbRequest$new(biodb::BiodbUrl$new(u))
             xmlstr <- self$getBiodb()$getRequestScheduler()$sendRequest(request)
 
             re <- 'PUGREST.BadRequest|PUGREST.NotFound'
             if (is.na(xmlstr) || length(grep(re, xmlstr)) > 0) {
-                if (concatenate) {
-                    biodb::warn("One of the IDs to retrieve is wrong.")
+                if (concatenate && length(id) > 1) {
+                    biodb::logDebug("One of the IDs to retrieve is wrong.")
                     concatenate <- FALSE
                     done <- FALSE
                     break
