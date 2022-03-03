@@ -9,7 +9,7 @@
 #' # Create an instance with default settings:
 #' mybiodb <- biodb::newInst()
 #'
-#' # Get a connector that inherits from ExpasyEnzymeConn:
+#' # Get a connector for CCDS database:
 #' conn <- mybiodb$getFactory()$createConn('ncbi.ccds')
 #'
 #' # Get the first entry

@@ -1,11 +1,12 @@
 #' @details
 #'
-#' See vignette biodbExpasy:
+#' See vignette biodbNcbi:
 #' ```
-#' vignette('biodbExpasy', package='biodbExpasy')
+#' vignette('biodbNcbi', package='biodbNcbi')
 #' ```
 #'
-#' @seealso \link{ExpasyEnzymeConn}.
+#' @seealso \link{NcbiGeneConn}, \link{NcbiCcdsConn},
+#' \link{NcbiPubchemCompConn} and \link{NcbiPubchemSubstConn}.
 #'
 #' @import biodb
 #' @import chk

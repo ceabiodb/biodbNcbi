@@ -1,0 +1,90 @@
+---
+title: "An introduction to biodbNcbi"
+author: "Pierrick Roger"
+date: "`r BiocStyle::doc_date()`"
+package: "`r BiocStyle::pkg_ver('biodbNcbi')`"
+abstract: |
+  How to use the NCBI Gene, CCDS, Pubchem Comp and Pubchem Subst connectors and
+  their methods.
+vignette: |
+  %\VignetteIndexEntry{Introduction to the biodbNcbi package.}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+output:
+  BiocStyle::html_document:
+    toc: yes
+    toc_depth: 4
+    toc_float:
+      collapsed: false
+  BiocStyle::pdf_document: default
+---
+
+# Purpose
+
+biodbNcbi is a *biodb* extension package that implements a connector to
+biodbNcbi, a library for connecting to the National Cancer Institute (USA)
+CACTUS Database.
+
+# Initialization
+
+The first step in using *biodbNcbi*, is to create an instance of the biodb
+class `Biodb` from the main *biodb* package. This is done by calling the
+constructor of the class:
+```{r, results='hide'}
+mybiodb <- biodb::newInst()
+```
+During this step the configuration is set up, the cache system is initialized
+and extension packages are loaded.
+
+We will see at the end of this vignette that the *biodb* instance needs to be
+terminated with a call to the `terminate()` method.
+
+# Creating a connector to CCDS
+
+In *biodb* the connection to a database is handled by a connector instance that
+you can get from the factory.
+biodbNcbi implements a connector to a remote database.
+Here is the code to instantiate a connector:
+```{r}
+ccds <- mybiodb$getFactory()$createConn('ncbi.ccds')
+```
+
+Creating other connectors follow the same process:
+```{r}
+gene <- mybiodb$getFactory()$createConn('ncbi.gene')
+pubchem.comp <- mybiodb$getFactory()$createConn('ncbi.pubchem.comp')
+pubchem.subst <- mybiodb$getFactory()$createConn('ncbi.pubchem.subst')
+```
+
+# Accessing entries
+
+To get the number of entries stored inside the database, run:
+```{r}
+ccds$getNbEntries()
+```
+
+To get some of the first entry IDs (accession numbers) from the database, run:
+```{r}
+ids <- ccds$getEntryIds(2)
+ids
+```
+
+To retrieve entries, use:
+```{r}
+entries <- ccds$getEntry(ids)
+entries
+```
+
+To convert a list of entries into a dataframe, run:
+```{r}
+x <- mybiodb$entriesToDataframe(entries)
+x
+```
+
+# Closing biodb instance
+
+When done with your *biodb* instance you have to terminate it, in order to
+ensure release of resources (file handles, database connection, etc):
+```{r}
+mybiodb$terminate()
+```
