@@ -81,6 +81,48 @@ x <- mybiodb$entriesToDataframe(entries)
 x
 ```
 
+# Accessing efetch web service
+
+**efetch** web service is accessible through the `wsEfetch()` method, available
+on Entrez connectors: `ncbi.gene`, `ncbi.pubchem.comp` and `ncbi.pubchem.subst`.
+
+Get the a Gene entry as an XML object and print the `Entrezgene_prot` node:
+```{r}
+entryxml <- gene$wsEfetch('2833', retmode='xml', retfmt='parsed')
+XML::getNodeSet(entryxml, "//Entrezgene_prot")
+```
+The object returned is an `XML::XMLInternalDocument`.
+
+# Accessing esearch web service
+
+**esearch** web service is accessible through the `wsEsearch()` method,
+available on Entrez connectors: `ncbi.gene`, `ncbi.pubchem.comp` and
+`ncbi.pubchem.subst`.
+
+Search for Gene entries by name and get the IDs of the matching entries
+(equivalent of running `gene$searchForEntries()`:
+```{r}
+gene$wsEsearch(term='"chemokine"[Gene Name]', retmax=10, retfmt='ids')
+```
+
+The same result can be obtained with a call to `searchForEntries()`:
+```{r}
+gene$searchForEntries(fields=list(name='chemokine'), max.results=10)
+```
+
+
+# Accessing einfo web service
+
+**einfo** web service is accessible through the `wsEinfo()` method, available
+on Entrez connectors: `ncbi.gene`, `ncbi.pubchem.comp` and `ncbi.pubchem.subst`.
+
+Get PubChem Comp database information as an XML object and print information on
+first field:
+```{r}
+infoxml <- pubchem.comp$wsEinfo(retfmt='parsed')
+XML::getNodeSet(infoxml, "//Field[1]")
+```
+
 # Closing biodb instance
 
 When done with your *biodb* instance you have to terminate it, in order to

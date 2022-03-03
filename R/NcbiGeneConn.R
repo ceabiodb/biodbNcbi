@@ -58,7 +58,7 @@ doGetEntryPageUrl=function(id) {
             term <- paste0('"', fields$name, '"', '[Gene Name]')
 
             # Set retmax
-            if (max.results <=0) {
+            if (max.results <= 0) {
                 xml <- self$wsEsearch(term=term, retmax=0, retfmt='parsed')
                 xpath <- "/eSearchResult/Count"
                 retmax <- as.integer(XML::xpathSApply(xml, xpath, XML::xmlValue))
