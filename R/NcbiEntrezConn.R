@@ -171,7 +171,7 @@ wsEsearch=function(term, field=NULL, retmax=NULL,
     return(results)
 }
 ),
-                              
+
 private=list(
     entrez.name=NULL
     ,entrez.tag=NULL
@@ -188,10 +188,41 @@ private=list(
 
     return(n)
 }
-        
-,doGetEntryContentFromDb=function(id) {
 
-    # Debug
+,extractReturnedIds=function(xml, tag, ns=NULL) {
+    nsname <- if (is.null(ns)) '' else paste0(names(ns)[[1]], ':')
+    xpath <- paste0("//", nsname, tag)
+    if (is.null(ns))
+        returned.ids <- XML::xpathSApply(xml, xpath, XML::xmlValue)
+    else
+        returned.ids <- XML::xpathSApply(xml, xpath, XML::xmlValue,
+        namespaces=ns)
+    return(returned.ids)
+}
+
+,extractIndividualContents=function(xml, tag, ns=NULL) {
+    nsname <- if (is.null(ns)) '' else paste0(names(ns)[[1]], ':')
+    xpath <- paste0("//", nsname, tag)
+    if (is.null(ns))
+        nodes <- XML::getNodeSet(xml, xpath)
+    else
+        nodes <- XML::getNodeSet(xml, xpath, namespaces=ns)
+    contents <- vapply(nodes, XML::saveXML, FUN.VALUE='')
+    return(contents)
+}
+
+,checkXml=function(xmlstr, re) {
+    v <- TRUE
+    if (is.na(xmlstr) || length(grep(re, xmlstr)) > 0) {
+        v <- FALSE
+        biodb::logDebug0("XML contains error messages.",
+            " At least one of the IDs to retrieve is wrong.")
+    }
+    return(v)
+}
+
+,retrieveContents=function(id, err.re, id.tag, entry.tag, ns=NULL) {
+
     biodb::logInfo("Get entry content(s) for %d id(s)...", length(id))
 
     URL.MAX.LENGTH <- 2048
@@ -216,32 +247,32 @@ private=list(
             request <- biodb::BiodbRequest$new(biodb::BiodbUrl$new(u))
             xmlstr <- self$getBiodb()$getRequestScheduler()$sendRequest(request)
 
-            if (is.na(xmlstr) || length(grep('<ERROR>', xmlstr)) > 0) {
+            # Handle errors
+            if ( ! private$checkXml(xmlstr, err.re)) {
                 if (concatenate && length(id) > 1) {
-                    biodb::logDebug0("Something went wrong while downloading",
-                        " several entries at once.")
-                    concatenate <- FALSE
-                    done <- FALSE
+                    concatenate <- done <- FALSE
                     break
                 }
                 next
             }
 
             # Parse XML
-            xml <-  XML::xmlInternalTreeParse(xmlstr, asText=TRUE)
+            xml <- XML::xmlInternalTreeParse(xmlstr, asText=TRUE)
 
-            # Get returned IDs
-            xpath <- paste0("//", private$entrez.id.tag)
-            returned.ids <- XML::xpathSApply(xml, xpath, XML::xmlValue)
-
-            # Store contents
-            nodes <- XML::getNodeSet(xml, paste0("//", private$entrez.tag))
-            c <- vapply(nodes, XML::saveXML, FUN.VALUE='')
-            content[match(returned.ids, id)] <- c
+            # Extract and store contents
+            returned.ids <- private$extractReturnedIds(xml, tag=id.tag, ns=ns)
+            individual.contents <- private$extractIndividualContents(xml,
+                tag=entry.tag, ns=ns)
+            content[match(returned.ids, id)] <- individual.contents
         }
     }
 
     return(content)
+}
+
+,doGetEntryContentFromDb=function(id) {
+    return(private$retrieveContents(id=id, err.re='<ERROR>',
+        id.tag=private$entrez.id.tag, entry.tag=private$entrez.tag))
 }
 
 ,doGetEntryContentRequest=function(id, concatenate=TRUE) {

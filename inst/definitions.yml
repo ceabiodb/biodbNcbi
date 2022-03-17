@@ -68,6 +68,8 @@ databases:
       base.url: https://pubchem.ncbi.nlm.nih.gov/
       ws.url: https://eutils.ncbi.nlm.nih.gov/entrez/eutils/
       ws2.url: https://pubchem.ncbi.nlm.nih.gov/rest/pug/
+    xml.ns:
+      pcns: "http://www.ncbi.nlm.nih.gov"
 
   ncbi.pubchem.subst:
     name: PubChem Substance
@@ -83,7 +85,8 @@ databases:
       base.url: https://pubchem.ncbi.nlm.nih.gov/
       ws.url: https://eutils.ncbi.nlm.nih.gov/entrez/eutils/
       ws2.url: https://pubchem.ncbi.nlm.nih.gov/rest/pug/
-
+    xml.ns:
+      pcns: "http://www.ncbi.nlm.nih.gov"
 
 fields:
 
