@@ -61,7 +61,8 @@ doGetEntryPageUrl=function(id) {
             if (max.results <= 0) {
                 xml <- self$wsEsearch(term=term, retmax=0, retfmt='parsed')
                 xpath <- "/eSearchResult/Count"
-                retmax <- as.integer(XML::xpathSApply(xml, xpath, XML::xmlValue))
+                retmax <- as.integer(XML::xpathSApply(xml, xpath,
+                    XML::xmlValue))
                 if (length(retmax) == 0)
                     retmax <- NULL
             }

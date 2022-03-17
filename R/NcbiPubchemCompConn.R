@@ -73,7 +73,7 @@ doSearchForEntries=function(fields=NULL, max.results=0) {
         if (max.results <= 0) {
             xml <- self$wsEsearch(term=term, retmax=0, retfmt='parsed')
             retmax <- as.integer(XML::xpathSApply(xml, "/eSearchResult/Count",
-                                                  XML::xmlValue))
+                XML::xmlValue))
             if (length(retmax) == 0)
                 retmax <- NA_integer_
         }

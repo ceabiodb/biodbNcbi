@@ -94,60 +94,10 @@ private=list(
 }
 
 ,doGetEntryContentFromDb=function(id) {
-
-    biodb::logInfo("Get entry content(s) for %d id(s)...", length(id))
-
-    URL.MAX.LENGTH <- 2048
-    concatenate <- TRUE
-    done <- FALSE
-
-    while ( ! done) {
-
-        done <- TRUE
-
-        # Initialize return values
-        content <- rep(NA_character_, length(id))
-
-        # Get URL requests
-        urls <- self$getEntryContentRequest(id,
-            concatenate=concatenate, max.length=URL.MAX.LENGTH)
-
-        # Loop on all URLs
-        for (u in urls) {
-
-            # Send request
-            request <- biodb::BiodbRequest$new(biodb::BiodbUrl$new(u))
-            xmlstr <- self$getBiodb()$getRequestScheduler()$sendRequest(request)
-
-            re <- 'PUGREST.BadRequest|PUGREST.NotFound'
-            if (is.na(xmlstr) || length(grep(re, xmlstr)) > 0) {
-                if (concatenate && length(id) > 1) {
-                    biodb::logDebug("One of the IDs to retrieve is wrong.")
-                    concatenate <- FALSE
-                    done <- FALSE
-                    break
-                }
-                next
-            }
-
-            # Parse XML
-            xml <-  XML::xmlInternalTreeParse(xmlstr, asText=TRUE)
-
-            # Get returned IDs
-            ns <- c(pcns="http://www.ncbi.nlm.nih.gov")
-            xpath <- paste0("//pcns:", private$id.xmltag)
-            returned.ids <- XML::xpathSApply(xml, xpath, XML::xmlValue,
-                                             namespaces=ns)
-
-            # Store contents
-            xpath <- paste0("//pcns:", private$entry.xmltag)
-            nodes <- XML::getNodeSet(xml, xpath, namespaces=ns)
-            c <- vapply(nodes, XML::saveXML, FUN.VALUE='')
-            content[match(returned.ids, id)] <- c
-        }
-    }
-
-    return(content)
+    re <- 'PUGREST.BadRequest|PUGREST.NotFound'
+    ns <- self$getPropertyValue('xml.ns')
+    return(private$retrieveContents(id=id, err.re=re, id.tag=private$id.xmltag,
+        entry.tag=private$entry.xmltag, ns=ns))
 }
 
 ,doGetEntryContentRequest=function(id, concatenate=TRUE) {
