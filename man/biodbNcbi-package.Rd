@@ -6,7 +6,7 @@
 \alias{biodbNcbi-package}
 \title{biodbNcbi: biodbNcbi, a library for connecting to NCBI Databases.}
 \description{
-The biodbNcbi library is an extension of the biodb framework package, that provides access to NCBI databases CCDS, Gene, Pubchem Comp and Pubchem Subst. It allows to retrieve entries by their accession number, and run specific web services.
+The biodbNcbi library provides access to the NCBI databases CCDS, Gene, Pubchem Comp and Pubchem Subst, using biodb package framework. It allows to retrieve entries by their accession number. Web services can be accessed for searching the database by name or mass.
 }
 \details{
 See vignette biodbNcbi:\preformatted{vignette('biodbNcbi', package='biodbNcbi')
