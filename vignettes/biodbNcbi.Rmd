@@ -4,26 +4,41 @@ author: "Pierrick Roger"
 date: "`r BiocStyle::doc_date()`"
 package: "`r BiocStyle::pkg_ver('biodbNcbi')`"
 abstract: |
-  How to use the NCBI Gene, CCDS, Pubchem Comp and Pubchem Subst connectors and
-  their methods.
+    How to use the NCBI Gene, CCDS, Pubchem Comp and Pubchem Subst connectors
+    and their methods.
 vignette: |
-  %\VignetteIndexEntry{Introduction to the biodbNcbi package.}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+    %\VignetteIndexEntry{Introduction to the biodbNcbi package.}
+    %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteEncoding{UTF-8}
 output:
-  BiocStyle::html_document:
-    toc: yes
-    toc_depth: 4
-    toc_float:
-      collapsed: false
-  BiocStyle::pdf_document: default
+    BiocStyle::html_document:
+        toc: yes
+        toc_depth: 4
+        toc_float:
+            collapsed: false
+    BiocStyle::pdf_document: default
+bibliography: references.bib
 ---
+
+# Introduction
+
+biodbNcbi is a *biodb* extension package that implements a connector to the
+NCBI databases [@sayers2022_NCBI] Gene, CCDS [@pruitt2009_CCDS; @harte2012_CCDS;
+@farrell2014_CCDS], Pubchem Comp and Pubchem Subst [@kim2015_PubChem].
 
 # Purpose
 
-biodbNcbi is a *biodb* extension package that implements a connector to
 biodbNcbi, a library for connecting to the National Cancer Institute (USA)
 CACTUS Database.
+
+# Installation
+
+Install using Bioconductor:
+```{r, eval=FALSE}
+if (!requireNamespace("BiocManager", quietly=TRUE))
+    install.packages("BiocManager")
+BiocManager::install('biodbNcbi')
+```
 
 # Initialization
 
@@ -130,3 +145,11 @@ ensure release of resources (file handles, database connection, etc):
 ```{r}
 mybiodb$terminate()
 ```
+
+# Session information
+
+```{r}
+sessionInfo()
+```
+
+# References
