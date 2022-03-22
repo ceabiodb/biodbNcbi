@@ -1,6 +1,6 @@
 Package: biodbNcbi
 Title: biodbNcbi, a library for connecting to NCBI Databases.
-Version: 0.99.4
+Version: 0.99.5
 Authors@R: 
     c(person(given = "Pierrick",
              family = "Roger",
