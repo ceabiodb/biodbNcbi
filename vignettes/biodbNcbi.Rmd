@@ -26,11 +26,6 @@ biodbNcbi is a *biodb* extension package that implements a connector to the
 NCBI databases [@sayers2022_NCBI] Gene, CCDS [@pruitt2009_CCDS; @harte2012_CCDS;
 @farrell2014_CCDS], Pubchem Comp and Pubchem Subst [@kim2015_PubChem].
 
-# Purpose
-
-biodbNcbi, a library for connecting to the National Cancer Institute (USA)
-CACTUS Database.
-
 # Installation
 
 Install using Bioconductor:
