@@ -1,13 +1,13 @@
 Package: biodbNcbi
 Title: biodbNcbi, a library for connecting to NCBI Databases.
-Version: 0.99.2
+Version: 0.99.3
 Authors@R: 
     c(person(given = "Pierrick",
              family = "Roger",
              role = c("aut", "cre"),
-             email = "pierrick.roger@cea.fr"),
+             email = "pierrick.roger@cea.fr",
              comment=c(ORCID="0000-0001-8177-4873")
-      )
+      ))
 Description: The biodbNcbi library provides access to the 
     NCBI databases CCDS, Gene, Pubchem Comp and
     Pubchem Subst, using biodb package framework. It allows to retrieve entries by their accession number. Web services can be accessed for searching the database by name or mass.
