@@ -49,19 +49,19 @@ and extension packages are loaded.
 We will see at the end of this vignette that the *biodb* instance needs to be
 terminated with a call to the `terminate()` method.
 
-# Creating a connector to CCDS
+# Creating a connector to Gene
 
 In *biodb* the connection to a database is handled by a connector instance that
 you can get from the factory.
 biodbNcbi implements a connector to a remote database.
 Here is the code to instantiate a connector:
 ```{r}
-ccds <- mybiodb$getFactory()$createConn('ncbi.ccds')
+gene <- mybiodb$getFactory()$createConn('ncbi.gene')
 ```
 
 Creating other connectors follow the same process:
 ```{r}
-gene <- mybiodb$getFactory()$createConn('ncbi.gene')
+ccds <- mybiodb$getFactory()$createConn('ncbi.ccds')
 pubchem.comp <- mybiodb$getFactory()$createConn('ncbi.pubchem.comp')
 pubchem.subst <- mybiodb$getFactory()$createConn('ncbi.pubchem.subst')
 ```
@@ -70,18 +70,18 @@ pubchem.subst <- mybiodb$getFactory()$createConn('ncbi.pubchem.subst')
 
 To get the number of entries stored inside the database, run:
 ```{r}
-ccds$getNbEntries()
+gene$getNbEntries()
 ```
 
 To get some of the first entry IDs (accession numbers) from the database, run:
 ```{r}
-ids <- ccds$getEntryIds(2)
+ids <- gene$getEntryIds(2)
 ids
 ```
 
 To retrieve entries, use:
 ```{r}
-entries <- ccds$getEntry(ids)
+entries <- gene$getEntry(ids)
 entries
 ```
 
