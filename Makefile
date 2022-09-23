@@ -33,7 +33,7 @@ ifeq (0,$(PKG_MAJOR))
 endif
 ifeq (,$(R_VERSION))
 #R_VERSION=$(shell grep '^ *R ' DESCRIPTION | sed 's/^.*[ =]\([0-9]\.[0-9]\(\.[0-9]\)\?\).*$$/\1/')
-R_VERSION=4.1.2
+R_VERSION=4.2.1
 endif
 
 # Use system tar instead of R built-in tar in order to avoid the following warning:
@@ -247,6 +247,7 @@ ifdef COMPILE
 endif
 	$(RM) -r *tests/*/output
 	$(RM) -r $(PKG_NAME).Rcheck
+	$(RM) -r $(PKG_NAME).BiocCheck
 	$(RM) -r Meta
 	$(RM) *.log
 	$(RM) .Rhistory
